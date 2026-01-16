@@ -23,7 +23,7 @@ jobs:
           echo "🔄 Pulling latest code..."
           cd /home/${{secrets.VPS_USER}}/vidhub/vidbox-api
           git reset --hard
-          git pull origin production
+          git pull origin main
           echo "🐳 Restarting Docker containers..."
           docker compose build             # build local image từ Dockerfile
           docker compose up -d --remove-orphans
