@@ -25,8 +25,8 @@ func (ur *UserRoutes) Register(r *gin.RouterGroup) {
 	// 	users.PUT("/:uuid", ur.handler.UpdateUser)
 	// 	users.DELETE("/:uuid", ur.handler.DeleteUser)
 	// }
-	users := r.Group("/crawler") 
-	{
-		users.GET("", ur.handler.Crawler)
-	}
+	// users := r.Group("/crawler") 
+	// {
+	// 	users.GET("", ur.handler.Crawler)
+	// }
 }
