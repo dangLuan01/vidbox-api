@@ -39,7 +39,7 @@ func NewConfig() *Config {
 	}
 
 	return &Config{
-		ServerAddress: fmt.Sprintf(":%s", utils.GetEnv("PORT", "8080")),
+		ServerAddress: fmt.Sprintf(":%s", utils.GetEnv("SERVER_PORT", "8080")),
 		DB: DatabaseConfig {
 			Host: utils.GetEnv("DB_HOST","localhost"),
 			Port: utils.GetEnv("DB_PORT","3306"),
