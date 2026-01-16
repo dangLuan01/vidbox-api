@@ -2,7 +2,7 @@ name: CI/CD for Go
 
 on:
   push:
-    branches: [ "production" ]
+    branches: [ "main" ]
 
 jobs:
   build-test-deploy:
@@ -21,7 +21,7 @@ jobs:
         port: 22
         script: |
           echo "🔄 Pulling latest code..."
-          cd vidhub/vidhub-api
+          cd /home/${{secrets.VPS_USER}}/vidhub/vidhub-api
           git reset --hard
           git pull origin production
           echo "🐳 Restarting Docker containers..."
