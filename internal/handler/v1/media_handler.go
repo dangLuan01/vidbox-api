@@ -20,7 +20,7 @@ func NewMediaHandler(service v1service.MediaService) *MediaHandler {
 	}
 }
 
-func (mh *MediaHandler) GetMedia(ctx *gin.Context) {
+func (mh *MediaHandler) GetMediaTv(ctx *gin.Context) {
 	var param v1dto.MediaInput
 
 	err := ctx.ShouldBindUri(&param)
@@ -29,7 +29,26 @@ func (mh *MediaHandler) GetMedia(ctx *gin.Context) {
 		utils.ResponseValidator(ctx, validation.HandlerValidationErrors(err))
 		return 
 	}
+	param.MediaType = "tv"
+	slug, err := mh.service.GetMedia(param)
+	if err != nil {
+		utils.ResponseError(ctx, err)
+		return
+	}
 
+	utils.ResponseSuccess(ctx, http.StatusOK, "Successfully.",slug)
+}
+
+func (mh *MediaHandler) GetMediaMovie(ctx *gin.Context) {
+	var param v1dto.MediaInput
+
+	err := ctx.ShouldBindUri(&param)
+	if err != nil {
+
+		utils.ResponseValidator(ctx, validation.HandlerValidationErrors(err))
+		return 
+	}
+	param.MediaType = "movie"
 	slug, err := mh.service.GetMedia(param)
 	if err != nil {
 		utils.ResponseError(ctx, err)

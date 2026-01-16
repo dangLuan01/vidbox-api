@@ -11,9 +11,9 @@ type Route interface {
 
 func RegisterRoute(r *gin.Engine, routes ...Route) {
 	v1api := r.Group("/api/v1")
-
 	v1api.Use(	
 		//middleware.ApiKeyMiddleware(),
+		middleware.CORSMiddleware(),
 		middleware.RateLimiterMiddleware(), 
 	)
 	

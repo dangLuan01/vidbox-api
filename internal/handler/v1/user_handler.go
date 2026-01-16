@@ -3,13 +3,11 @@ package v1handler
 import (
 	"net/http"
 
-	v1dto "vidbox-api/internal/dto/v1"
 	v1service "vidbox-api/internal/service/v1"
 
 	"github.com/google/uuid"
 
 	"vidbox-api/internal/utils"
-	"vidbox-api/internal/validation"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,92 +24,11 @@ func NewUserHandler(service v1service.UserService) *UserHandler {
 	}
 }
 
-func (uh *UserHandler) GetAllUser(ctx *gin.Context)  {
-	users, err := uh.service.GetAllUser()
-	if err != nil {
+func (uh *UserHandler) Crawler(ctx *gin.Context) {
+	if err := uh.service.Crawler(); err != nil {
 		utils.ResponseError(ctx, err)
-		return
-	}
-	utils.ResponseSuccess(ctx, http.StatusOK, "Successfully" ,v1dto.MapUsersDTO(users))
-	
-}
-func (uh *UserHandler) GetUserByUUID(ctx *gin.Context)  {
-	var param GetUserByUUIDParam
-	err := ctx.ShouldBindUri(&param)
-	if err != nil {
-
-		utils.ResponseValidator(ctx, validation.HandlerValidationErrors(err))
-		return 
-	}
-	user, err := uh.service.GetUserByUUID(param.Uuid)
-
-	if err != nil {
-
-		utils.ResponseError(ctx, err)
-		return
-	}
-	
-	utils.ResponseSuccess(ctx, http.StatusOK, "Successfully",v1dto.MapUserDTO(user))
-}
-func (uh *UserHandler) CreateUser(ctx *gin.Context) {
-
-	var input v1dto.CreateUserInput
-	if err := ctx.ShouldBindJSON(&input); err != nil {
-
-		utils.ResponseValidator(ctx, validation.HandlerValidationErrors(err))
-
-		return
-	}
-	user := input.MapCreateInputToModel()
-	
-	createUser, err := uh.service.CreateUser(user)
-	if err != nil {
-
-		utils.ResponseError(ctx, err)
-
-		return
 	}
 
-	utils.ResponseSuccess(ctx, http.StatusCreated, "Successfully", v1dto.MapUserDTO(createUser))
-}
-func (uh *UserHandler) UpdateUser(ctx *gin.Context)  {
-	var param GetUserByUUIDParam
-	err := ctx.ShouldBindUri(&param)
-	if err != nil {
+	utils.ResponseSatus(ctx, http.StatusOK)
 
-		utils.ResponseValidator(ctx, validation.HandlerValidationErrors(err))
-		return 
-	}
-
-	var input v1dto.UpdateUserInput
-	if err := ctx.ShouldBindJSON(&input); err != nil {
-		utils.ResponseValidator(ctx, validation.HandlerValidationErrors(err))
-
-		return
-	}
-
-	user := input.MapUpdateInputToModel()
-
-	updateUser, err := uh.service.UpdateUser(param.Uuid, user)
-	if err != nil {
-		utils.ResponseError(ctx, err)
-		return
-	}
-
-	utils.ResponseSuccess(ctx, http.StatusOK ,"Successfully", updateUser)
-}
-func (uh *UserHandler) DeleteUser(ctx *gin.Context)  {
-	var param GetUserByUUIDParam
-	err := ctx.ShouldBindUri(&param)
-	if err != nil {
-
-		utils.ResponseValidator(ctx, validation.HandlerValidationErrors(err))
-		return 
-	}
-	if err := uh.service.DeleteUser(param.Uuid); err != nil {
-		utils.ResponseError(ctx, err)
-		return
-	}
-	
-	utils.ResponseSatus(ctx, http.StatusNoContent)
 }

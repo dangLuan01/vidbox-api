@@ -17,8 +17,10 @@ func NewMediaRoutes(handler *v1handler.MediaHandler) *MediaRoutes {
 }
 
 func (mr *MediaRoutes) Register(r *gin.RouterGroup) {
+	
 	medias := r.Group("/")
 	{
-		medias.GET(":media_type/:tmdb_id/:season", mr.handler.GetMedia)
+		medias.GET("tv/:tmdb_id/:season", mr.handler.GetMediaTv)
+		medias.GET("movie/:tmdb_id", mr.handler.GetMediaMovie)
 	}
 }

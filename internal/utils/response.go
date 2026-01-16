@@ -66,7 +66,7 @@ func ResponseSuccess(ctx *gin.Context, status int, message string, data any) {
 	ctx.JSON(status, gin.H{
 		"status": status,
 		"message": message,
-		"data": data,
+		"results": data,
 	})
 }
 

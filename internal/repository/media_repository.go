@@ -22,11 +22,19 @@ func (mr *SqlMediaRepository) FindByTMDBID(params v1dto.MediaInput) (string, err
 
 	ds := mr.db.From(goqu.T("medias")).Select(
 		goqu.C("ophim_slug"),
-	).Where(
-		goqu.C("tmdb_id").Eq(params.TMDBID),
-		goqu.C("season").Eq(params.Season),
-		goqu.C("media_type").Eq(params.MediaType),
 	)
+
+	if params.MediaType == "tv" {
+		ds = ds.Where(
+			goqu.C("tmdb_id").Eq(params.TMDBID),
+			goqu.C("season").Eq(params.Season),
+		)	
+	} else {
+		ds = ds.Where(
+			goqu.C("tmdb_id").Eq(params.TMDBID),
+			goqu.C("season").IsNull(),
+		)
+	}
 
 	found, err := ds.ScanVal(&slug)
 	if err != nil {

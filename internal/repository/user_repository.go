@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 
+	v1dto "vidbox-api/internal/dto/v1"
 	"vidbox-api/internal/models"
 
 	"github.com/doug-martin/goqu/v9"
@@ -135,5 +136,16 @@ func (ur *SqlUserRepository) UpdatePassword(uuid uuid.UUID, password string) err
 		return err
 	}
 
+	return nil
+}
+
+func (ur *SqlUserRepository) StoreCrawler(media []v1dto.MediaCrawler) error {
+	if len(media) > 0 {
+		_, err := ur.db.Insert(goqu.T("medias")).Rows(media).Executor().Exec()
+		if err != nil {
+			return err
+		}
+	}
+	
 	return nil
 }

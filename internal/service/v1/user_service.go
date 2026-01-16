@@ -1,15 +1,27 @@
 package v1service
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
 
-	"vidbox-api/internal/models"
+	v1dto "vidbox-api/internal/dto/v1"
 	"vidbox-api/internal/repository"
-	"vidbox-api/internal/utils"
-
-	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
+
+type Response struct {
+    Data struct {
+        Items []struct {
+            TMDB struct {
+                Type   string `json:"type"`
+                ID     string `json:"id"`
+                Season *int   `json:"season"`
+            } `json:"tmdb"`
+            Slug string `json:"slug"`
+        } `json:"items"`
+    } `json:"data"`
+}
 
 type userService struct {
 	repo repository.UserRepository
@@ -21,109 +33,37 @@ func NewUserService(repo repository.UserRepository) UserService {
 	}
 }
 
-func (us *userService) GetAllUser()  ([]models.User, error) {
-	users, err := us.repo.FindAll()
-	if err != nil {
-		
-		return nil, utils.WrapError(
-			string(utils.ErrCodeInternal), 
-			"Faile fetch users.", 
-			err,
-		)
-	}
-
-	return users, nil
-}
-
-func (us *userService) GetUserByUUID(uuid uuid.UUID) (models.User, error) {
-	
-	user, err := us.repo.FindBYUUID(uuid);
-	if err != nil {
-
-		return models.User{}, utils.NewError(string(utils.ErrCodeNotFound), "No user")
-	}
-	
-	return user, nil
-}
-
-func (us *userService) CreateUser(user models.User) (models.User, error) {
-	user.Email = utils.NormailizeString(user.Email)
-	if user, err := us.repo.FindByEmail(user.Email); err != nil {
-		
-		return models.User{}, utils.NewError(
-			string(utils.ErrCodeConflict), 
-			fmt.Sprintf("Email: %v already existed.", user.Email),
-		)
-	}
-	user.UUID = uuid.New()
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if err != nil {
-
-		return models.User{}, utils.WrapError(
-			string(utils.ErrCodeInternal), 
-			"Faile hash password", 
-			err,
-		)
-	}
-	user.Password = string(hashPassword)
-	if err := us.repo.Create(user); err != nil {
-
-		return models.User{}, utils.WrapError(
-			string(utils.ErrCodeInternal), 
-			"Faile create user", 
-			err,
-		)
-	}
-	
-	return user, nil
-}
-func (us *userService) UpdateUser(uuid uuid.UUID, user models.User) (models.User, error) {
-	user.Email = utils.NormailizeString(user.Email)
-	if u, err := us.repo.FindByEmail(user.Email); err != nil && u.UUID != uuid{
-		
-		return models.User{}, utils.NewError(
-			string(utils.ErrCodeConflict), 
-			fmt.Sprintf("Email: %v already existed.", u.Email),
-		)
-	}
-	currencyUser, err := us.repo.FindBYUUID(uuid)
-	if err != nil {
-		return models.User{}, utils.NewError(string(utils.ErrCodeNotFound), "user not found")
-	}
-	
-	currencyUser.Name = user.Name
-	currencyUser.Email = user.Email
-
-	if user.Password != "" {
-		hashPassword, err :=bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+func (us *userService) Crawler() error {
+	for i := 1; i <= 167; i++ {
+		fmt.Printf("DANG CRAWLER PAGE:%d\n", i)
+		resp, err := http.Get(fmt.Sprintf("https://ophim1.com/v1/api/danh-sach/hoat-hinh?page=%d", i))
 		if err != nil {
-			return models.User{}, utils.WrapError(string(utils.ErrCodeInternal), "Faile hash pass", err)
+			log.Printf("CRAWLER ERR PAGE:%d\n", i)
 		}
-		currencyUser.Password = string(hashPassword)
-		
-	}
-	if user.Age != 0 {
-		currencyUser.Age = user.Age	
-	}
-	if user.Level != 0 {
-		currencyUser.Level = user.Level	
-	}
-	
-	if user.Status != 0 {
-		currencyUser.Status = user.Status	
-	}
-	
-	if err := us.repo.Update(uuid, currencyUser); err != nil {
-		return models.User{}, utils.WrapError(string(utils.ErrCodeInternal), "Faile update user", err)
-	}
-	return currencyUser, nil
-}
+		defer resp.Body.Close()
 
-func (us *userService) DeleteUser(uuid uuid.UUID) error {
-	if err := us.repo.Delete(uuid); err != nil {
-		return utils.WrapError(string(utils.ErrCodeInternal), "Faile delete user", err)
+		var raw Response
+		if err := json.NewDecoder(resp.Body).Decode((&raw)); err != nil {
+			log.Printf("DECODE ERR PAGE:%d\n", i)
+		}
+
+		var results []v1dto.MediaCrawler
+
+		for _, item := range raw.Data.Items {
+			if item.TMDB.ID != "" {
+				results = append(results, v1dto.MediaCrawler{
+					Type: item.TMDB.Type,
+					TMDBID: item.TMDB.ID,
+					Season: item.TMDB.Season,
+					Slug: item.Slug,
+				})
+			}
+		}
+
+		if err := us.repo.StoreCrawler(results); err != nil {
+			return err
+		}
 	}
-	
+
 	return nil
-
 }
