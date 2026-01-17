@@ -13,6 +13,7 @@ type UserRepository interface {
 	// FindByEmail(email string) (models.User, error)
 	// UpdatePassword(uuid uuid.UUID, password string) error
 	StoreCrawler(media []v1dto.MediaCrawler) error
+	FindSlugExist(slug string) bool
 }
 
 type MediaRepository interface {

@@ -1,14 +1,10 @@
 package repository
 
 import (
-	"fmt"
-	"slices"
-
 	v1dto "vidbox-api/internal/dto/v1"
 	"vidbox-api/internal/models"
 
 	"github.com/doug-martin/goqu/v9"
-	"github.com/google/uuid"
 )
 
 type SqlUserRepository struct {
@@ -23,122 +19,6 @@ func NewSqlUserRepository(DB *goqu.Database) UserRepository {
 	}
 }
 
-func (ur *SqlUserRepository) FindAll() ([]models.User, error){
-	
-	ds := ur.db.From(goqu.T("users")).
-	Select(
-		goqu.I("uuid"),
-		goqu.I("name"),
-		goqu.I("email"),
-		goqu.I("age"),
-		goqu.I("level"),
-		goqu.I("status"),
-	)
-	var users []models.User
-	if err := ds.ScanStructs(&users); err != nil {
-		return nil, fmt.Errorf("faile get all user:%v", err)
-	}
-
-	return users, nil
-}
-
-func (ur *SqlUserRepository) FindBYUUID(uuid uuid.UUID) (models.User, error) {
-	ds := ur.db.From(goqu.T("users")).
-	Where(
-		goqu.C("uuid").Eq(uuid),
-	).
-	Select(
-		goqu.I("uuid"),
-		goqu.I("name"),
-		goqu.I("email"),
-		goqu.I("age"),
-		goqu.I("level"),
-		goqu.I("status"),
-	)
-	var user models.User
-
-	found, err := ds.ScanStruct(&user)
-	if err != nil || !found {
-		return  models.User{}, err
-	}
-
-	return user, err
-}
-
-func (ur *SqlUserRepository) Create(user models.User) error {
-	insertUser := ur.db.Insert("users").Rows(user).Executor()
-	if _, err := insertUser.Exec(); err != nil {
-       return fmt.Errorf("faile insert rows user")
-	}
-
-	return nil
-}
-
-func (ur *SqlUserRepository) Update(uuid uuid.UUID, user models.User) error {
-	// for i, u := range ur.users{
-	// 	if u.UUID == uuid {
-	// 		ur.users[i] = user
-	// 		return nil
-	// 	}
-	// }
-	
-	_, err := ur.db.Update(goqu.T("users")).Set(
-		models.User{
-			Name: user.Name,
-			Email: user.Email,
-		},
-	).Executor().Exec()
-	if err != nil {
-		return err
-	}
-	
-	return fmt.Errorf("user not found")
-}
-
-func (ur *SqlUserRepository) Delete(uuid uuid.UUID) error {
-
-	for i, u := range ur.users{
-		if u.UUID == uuid {
-			ur.users = slices.Delete(ur.users, i, i + 1)
-			return nil
-		}
-	}
-
-	return fmt.Errorf("user not found")
-}
-func (ur *SqlUserRepository) FindByEmail(email string) (models.User, error) {
-	
-	ds := ur.db.From(goqu.T("users")).Where(
-		goqu.C("email").Eq(email),
-	).Limit(1)
-	
-    var user models.User
-    found, err := ds.ScanStruct(&user)
-	if err != nil {
-		return models.User{}, err
-	}
-	
-	if found {
-		return user, nil
-	}
-
-	return models.User{}, err
-}
-
-func (ur *SqlUserRepository) UpdatePassword(uuid uuid.UUID, password string) error {
-
-	_, err := ur.db.Update(goqu.T("users")).Set(goqu.Record{"password": password}).
-	Where(
-		goqu.C("uuid").Eq(uuid),
-	).Executor().Exec()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (ur *SqlUserRepository) StoreCrawler(media []v1dto.MediaCrawler) error {
 	if len(media) > 0 {
 		_, err := ur.db.Insert(goqu.T("medias")).Rows(media).Executor().Exec()
@@ -148,4 +28,24 @@ func (ur *SqlUserRepository) StoreCrawler(media []v1dto.MediaCrawler) error {
 	}
 	
 	return nil
+}
+
+func (ur *SqlUserRepository) FindSlugExist(slug string) bool{
+
+	var slugOphim string
+
+	ds := ur.db.From(goqu.T("medias")).Where(
+		goqu.C("ophim_slug").Eq(slug),
+	)
+
+	found, err := ds.ScanVal(&slugOphim)
+	if found {
+		return true
+	}
+
+	if err != nil {
+		return true
+	}
+
+	return false
 }

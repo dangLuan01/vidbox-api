@@ -34,9 +34,9 @@ func NewUserService(repo repository.UserRepository) UserService {
 }
 
 func (us *userService) Crawler() error {
-	for i := 1; i <= 167; i++ {
-		fmt.Printf("DANG CRAWLER PAGE:%d\n", i)
-		resp, err := http.Get(fmt.Sprintf("https://ophim1.com/v1/api/danh-sach/hoat-hinh?page=%d", i))
+	for i := 1; i <= 5; i++ {
+		
+		resp, err := http.Get(fmt.Sprintf("https://ophim1.com/v1/api/danh-sach/phim-moi?page=%d", i))
 		if err != nil {
 			log.Printf("CRAWLER ERR PAGE:%d\n", i)
 		}
@@ -50,7 +50,7 @@ func (us *userService) Crawler() error {
 		var results []v1dto.MediaCrawler
 
 		for _, item := range raw.Data.Items {
-			if item.TMDB.ID != "" {
+			if item.TMDB.ID != "" && !us.repo.FindSlugExist(item.Slug) {
 				results = append(results, v1dto.MediaCrawler{
 					Type: item.TMDB.Type,
 					TMDBID: item.TMDB.ID,
