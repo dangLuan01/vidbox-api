@@ -55,5 +55,5 @@ func (mh *MediaHandler) GetMediaMovie(ctx *gin.Context) {
 		return
 	}
 
-	utils.ResponseSuccess(ctx, http.StatusOK, "Successfully.",slug)
+	utils.ResponseSuccess(ctx, http.StatusOK, "Successfully.", slug)
 }

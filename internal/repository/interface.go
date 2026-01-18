@@ -17,5 +17,5 @@ type UserRepository interface {
 }
 
 type MediaRepository interface {
-	FindByTMDBID(params v1dto.MediaInput) (string, error)
+	FindByTMDBID(params v1dto.MediaInput) (v1dto.MediaOutput, error)
 }

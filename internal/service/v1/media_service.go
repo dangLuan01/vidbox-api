@@ -15,10 +15,10 @@ func NewMediaService(repo repository.MediaRepository) MediaService {
 	}
 }
 
-func (ms *mediaService) GetMedia(params v1dto.MediaInput) (string, error) {
+func (ms *mediaService) GetMedia(params v1dto.MediaInput) (v1dto.MediaOutput, error) {
 	slug, err := ms.repo.FindByTMDBID(params)
 	if err != nil {
-		return "", err
+		return v1dto.MediaOutput{}, err
 	}
 
 	return slug, nil
