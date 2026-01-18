@@ -14,5 +14,5 @@ type UserService interface {
 }
 
 type MediaService interface {
-	GetMedia(params v1dto.MediaInput) (string, error)
+	GetMedia(params v1dto.MediaInput) (v1dto.MediaOutput, error)
 }

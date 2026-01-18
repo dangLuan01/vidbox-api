@@ -17,11 +17,12 @@ func NewSqlMediaRepository(DB *goqu.Database) MediaRepository {
 	}
 }
 
-func (mr *SqlMediaRepository) FindByTMDBID(params v1dto.MediaInput) (string, error) {
-	var slug string
+func (mr *SqlMediaRepository) FindByTMDBID(params v1dto.MediaInput) (v1dto.MediaOutput, error) {
+	var slug v1dto.MediaOutput
 
 	ds := mr.db.From(goqu.T("medias")).Select(
 		goqu.C("ophim_slug"),
+		goqu.C("kkphim_slug"),
 	)
 
 	if params.MediaType == "tv" {
@@ -36,13 +37,13 @@ func (mr *SqlMediaRepository) FindByTMDBID(params v1dto.MediaInput) (string, err
 		)
 	}
 
-	found, err := ds.ScanVal(&slug)
+	found, err := ds.ScanStruct(&slug)
 	if err != nil {
-		return "", utils.WrapError(string(utils.ErrCodeInternal), "Error", err)
+		return v1dto.MediaOutput{}, utils.WrapError(string(utils.ErrCodeInternal), "Error", err)
 	}
 
 	if !found {
-		return "", utils.NewError(string(utils.ErrCodeNotFound), "Not found.")
+		return v1dto.MediaOutput{}, utils.NewError(string(utils.ErrCodeNotFound), "Not found.")
 	}
 
 	return slug, nil

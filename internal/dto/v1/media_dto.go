@@ -6,6 +6,11 @@ type MediaInput struct {
 	MediaType 	string `json:"media_type"`
 }
 
+type MediaOutput struct {
+	OPhimSlug 	*string	`db:"ophim_slug" json:"ophim_slug"`
+	KKPhimSlug 	*string	`db:"kkphim_slug" json:"kkphim_slug"`
+}
+
 type MediaCrawler struct {
 	Type 	string 	`db:"media_type" json:"type"`
 	TMDBID 	string 	`db:"tmdb_id" json:"id"`
