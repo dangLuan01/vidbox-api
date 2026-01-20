@@ -17,3 +17,10 @@ type MediaCrawler struct {
 	Season 	*int	`db:"season" json:"season"`
 	Slug	string	`db:"ophim_slug" json:"slug"`
 }
+
+type MediaCrawlerKKphim struct {
+	Type 	string 	`db:"media_type" json:"type"`
+	TMDBID 	string 	`db:"tmdb_id" json:"id"`
+	Season 	*int	`db:"season" json:"season"`
+	Slug	string	`db:"kkphim_slug" json:"slug"`
+}

@@ -3,9 +3,12 @@ package utils
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"html"
 	"math/big"
 	"os"
+	"regexp"
 	"strconv"
+	"strings"
 )
 
 func GetEnv(key, defaultValue string) string {
@@ -53,4 +56,30 @@ func GenerateRandomInt(lenght int) (string, error) {
 	}
 
 	return string(number), nil
+}
+
+func RegexOriginalName(name string) string {
+	decodedName := html.UnescapeString(name)
+
+	re := regexp.MustCompile(`\s*\(.*\)|\d+`)
+	output := re.ReplaceAllString(decodedName, "")
+	return strings.Join(strings.Fields(output), " ")
+}
+
+func ExtractNumber(input string) *int {
+	defaultSeason := 1
+	re 	:= regexp.MustCompile(`\d+`)
+	match := re.FindString(input)
+
+	if match != "" {
+		number, err := strconv.Atoi(match)
+		if err == nil {
+			if number > 30 {
+				return &defaultSeason			
+			}
+			return &number
+		}
+	}
+
+	return &defaultSeason
 }

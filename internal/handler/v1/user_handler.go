@@ -32,3 +32,28 @@ func (uh *UserHandler) Crawler(ctx *gin.Context) {
 	utils.ResponseSatus(ctx, http.StatusOK)
 
 }
+
+func (uh *UserHandler) CrawlerTvKkphim(ctx *gin.Context) {
+	if err := uh.service.CrawlerTvKkphim(); err != nil {
+		utils.ResponseError(ctx, err)
+	}
+
+	utils.ResponseSatus(ctx, http.StatusOK)
+
+}
+
+func (uh *UserHandler) CrawlerMovieKkphim(ctx *gin.Context) {
+	if err := uh.service.CrawlerMovieKkphim(); err != nil {
+		utils.ResponseError(ctx, err)
+	}
+
+	utils.ResponseSatus(ctx, http.StatusOK)
+}
+
+func (uh *UserHandler) CrawlerAllKkphim(ctx *gin.Context) {
+	if err := uh.service.CrawlerAllKKphim(); err != nil {
+		utils.ResponseError(ctx, err)
+	}
+
+	utils.ResponseSatus(ctx, http.StatusOK)
+}
