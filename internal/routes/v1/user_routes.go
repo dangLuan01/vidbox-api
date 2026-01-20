@@ -28,5 +28,8 @@ func (ur *UserRoutes) Register(r *gin.RouterGroup) {
 	users := r.Group("/crawler") 
 	{
 		users.GET("", ur.handler.Crawler)
+		// users.GET("/kkphim/tv", ur.handler.CrawlerTvKkphim)
+		// users.GET("/kkphim/movie", ur.handler.CrawlerMovieKkphim)
+		users.GET("/kkphim/all", ur.handler.CrawlerAllKkphim)
 	}
 }
