@@ -59,9 +59,8 @@ func (uh *UserHandler) CrawlerAllKkphim(ctx *gin.Context) {
 }
 //NGUONC
 func (uh *UserHandler) CrawlerTvNguonC(ctx *gin.Context) {
-	go func() {
-		uh.service.CrawlerTvNguonC()
-	}()
+	
+	go uh.service.CrawlerTvNguonC()
 	
 	utils.ResponseSatus(ctx, http.StatusOK)
 }
