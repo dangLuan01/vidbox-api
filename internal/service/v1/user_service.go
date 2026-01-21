@@ -303,3 +303,45 @@ func (us *userService) SearchMovie(name string, year int) int {
 	log.Printf("⛔ Name Search Not Found:%s\n", name)
 	return 0
 }
+
+func (us *userService) CrawlerTvNguonC() error {
+	for i := 1; i <= 13106; i++ {
+		log.Printf("CRAWLER PAGE:%d", i)
+		resp, err := http.Get(fmt.Sprintf("https://phim.nguonc.com/api/films/danh-sach/phim-bo?page=%d", i))
+		if err != nil {
+			log.Printf("CRAWLER ERR PAGE:%d\n", i)
+		}
+		defer resp.Body.Close()
+
+		var raw ResponseKKphim
+		if err := json.NewDecoder(resp.Body).Decode((&raw)); err != nil {
+			log.Printf("DECODE ERR PAGE:%d\n", i)
+		}
+
+		var results []v1dto.MediaCrawlerKKphim
+
+		for _, item := range raw.Data.Items {
+			// if us.repo.FindSlugExistKKphim(item.Slug) {
+			// 	log.Printf("🎯 SLUG EXTING:%s\n", item.Slug)
+			// 	continue
+			// }
+			tmdbId := us.SearchTv(utils.RegexOriginalName(item.OriginName), item.Year)
+			if tmdbId != 0 {
+				//log.Printf("🎉 FOUND NEW SLUG:%s - %d\n", utils.RegexOriginalName(item.OriginName), tmdbId)
+				results = append(results, v1dto.MediaCrawlerKKphim{
+					Type: "tv",
+					Season: utils.ExtractNumber(item.Slug),
+					TMDBID: strconv.Itoa(tmdbId),
+					Slug: item.Slug,
+				})
+				time.Sleep(200 * time.Millisecond)
+			}
+		}
+		
+		if err := us.repo.StoreCrawlerNguonC(results); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
