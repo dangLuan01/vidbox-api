@@ -9,6 +9,7 @@ type UserService interface {
 	CrawlerTvKkphim() error
 	CrawlerMovieKkphim() error
 	CrawlerAllKKphim() error
+	CrawlerTvNguonC() error
 }
 
 type MediaService interface {

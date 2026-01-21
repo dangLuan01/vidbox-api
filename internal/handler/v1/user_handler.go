@@ -23,7 +23,7 @@ func NewUserHandler(service v1service.UserService) *UserHandler {
 		service: service,
 	}
 }
-
+//OPHIM
 func (uh *UserHandler) Crawler(ctx *gin.Context) {
 	if err := uh.service.Crawler(); err != nil {
 		utils.ResponseError(ctx, err)
@@ -33,13 +33,13 @@ func (uh *UserHandler) Crawler(ctx *gin.Context) {
 
 }
 
+//KKPHIM
 func (uh *UserHandler) CrawlerTvKkphim(ctx *gin.Context) {
 	if err := uh.service.CrawlerTvKkphim(); err != nil {
 		utils.ResponseError(ctx, err)
 	}
 
 	utils.ResponseSatus(ctx, http.StatusOK)
-
 }
 
 func (uh *UserHandler) CrawlerMovieKkphim(ctx *gin.Context) {
@@ -52,6 +52,14 @@ func (uh *UserHandler) CrawlerMovieKkphim(ctx *gin.Context) {
 
 func (uh *UserHandler) CrawlerAllKkphim(ctx *gin.Context) {
 	if err := uh.service.CrawlerAllKKphim(); err != nil {
+		utils.ResponseError(ctx, err)
+	}
+
+	utils.ResponseSatus(ctx, http.StatusOK)
+}
+//NGUONC
+func (uh *UserHandler) CrawlerTvNguonC(ctx *gin.Context) {
+	if err := uh.service.CrawlerTvNguonC(); err != nil {
 		utils.ResponseError(ctx, err)
 	}
 
