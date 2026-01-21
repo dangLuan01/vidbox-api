@@ -37,6 +37,13 @@ type ResponseKKphim struct {
     } `json:"data"`
 }
 
+type ResponseNguonC struct {
+    Items []struct {
+        OriginName 		string 	`json:"original_name"`
+		Slug 			string 	`json:"slug"`
+    } `json:"items"`
+}
+
 type ResponseAllKKphim struct {
     Items []struct {
 		EpisodeCurrent 	string  `json:"episode_current"`
@@ -280,6 +287,30 @@ func (us *userService) SearchTv(name string, year int) int {
 	return 0
 }
 
+func (us *userService) SearchTvNguonC(name string) int {
+	resp, err := http.Get(fmt.Sprintf("https://api.themoviedb.org/3/search/tv?api_key=ef311eb0b9b07b9c73e9fb0a732cc150&query=%v&include_adult=false&language=en-US&page=1", name))
+	if err != nil {
+		log.Printf("⛔ SEARCH TV ERR:%s\n", err)
+		return 0
+	}
+	defer resp.Body.Close()
+
+	var raw ResponseTmdb
+	if err := json.NewDecoder(resp.Body).Decode((&raw)); err != nil {
+		
+		log.Printf("⛔ DECODE TV ERR:%s\n", err)
+		log.Printf("⛔ Name Search ERR:%s\n", name)
+		log.Printf("⛔ BODY ERR:%s\n", resp.Body)
+		return 0
+	}
+
+	if len(raw.Results) > 0 {
+		return raw.Results[0].Id	
+	}
+	log.Printf("⛔ Name Search Not Found:%s\n", name)
+	return 0
+}
+
 func (us *userService) SearchMovie(name string, year int) int {
 	resp, err := http.Get(fmt.Sprintf("https://api.themoviedb.org/3/search/movie?api_key=ef311eb0b9b07b9c73e9fb0a732cc150&query=%s&include_adult=false&language=en-US&page=1&year=%d", name, year))
 	if err != nil {
@@ -313,28 +344,28 @@ func (us *userService) CrawlerTvNguonC() error {
 		}
 		defer resp.Body.Close()
 
-		var raw ResponseKKphim
+		var raw ResponseNguonC
 		if err := json.NewDecoder(resp.Body).Decode((&raw)); err != nil {
 			log.Printf("DECODE ERR PAGE:%d\n", i)
 		}
 
-		var results []v1dto.MediaCrawlerKKphim
+		var results []v1dto.MediaCrawlerNguonC
 
-		for _, item := range raw.Data.Items {
+		for _, item := range raw.Items {
 			// if us.repo.FindSlugExistKKphim(item.Slug) {
 			// 	log.Printf("🎯 SLUG EXTING:%s\n", item.Slug)
 			// 	continue
 			// }
-			tmdbId := us.SearchTv(utils.RegexOriginalName(item.OriginName), item.Year)
+			tmdbId := us.SearchTvNguonC(utils.RegexOriginalName(item.OriginName))
 			if tmdbId != 0 {
 				//log.Printf("🎉 FOUND NEW SLUG:%s - %d\n", utils.RegexOriginalName(item.OriginName), tmdbId)
-				results = append(results, v1dto.MediaCrawlerKKphim{
+				results = append(results, v1dto.MediaCrawlerNguonC{
 					Type: "tv",
 					Season: utils.ExtractNumber(item.Slug),
 					TMDBID: strconv.Itoa(tmdbId),
 					Slug: item.Slug,
 				})
-				time.Sleep(200 * time.Millisecond)
+				time.Sleep(500 * time.Millisecond)
 			}
 		}
 		

@@ -113,7 +113,7 @@ func (ur *SqlUserRepository) StoreCrawlerKKphim(media []v1dto.MediaCrawlerKKphim
 	return nil
 }
 
-func (ur *SqlUserRepository) StoreCrawlerNguonC(media []v1dto.MediaCrawlerKKphim) error {
+func (ur *SqlUserRepository) StoreCrawlerNguonC(media []v1dto.MediaCrawlerNguonC) error {
 
 	if len(media) > 0 {
 		_, err := ur.db.Insert(goqu.T("provider_nguoncs")).Rows(media).Executor().Exec()
