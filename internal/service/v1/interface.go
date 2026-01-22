@@ -6,11 +6,8 @@ import (
 
 type UserService interface {
 	Crawler() error
-	CrawlerTvKkphim() error
-	CrawlerMovieKkphim() error
 	CrawlerAllKKphim() error
-	CrawlerTvNguonC() error
-	CrawlerMovieNguonC() error
+	CrawlerAllNguonC() error
 }
 
 type MediaService interface {

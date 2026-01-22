@@ -27,22 +27,6 @@ func (uh *UserHandler) Crawler(ctx *gin.Context) {
 }
 
 //KKPHIM
-func (uh *UserHandler) CrawlerTvKkphim(ctx *gin.Context) {
-	if err := uh.service.CrawlerTvKkphim(); err != nil {
-		utils.ResponseError(ctx, err)
-	}
-
-	utils.ResponseSatus(ctx, http.StatusOK)
-}
-
-func (uh *UserHandler) CrawlerMovieKkphim(ctx *gin.Context) {
-	if err := uh.service.CrawlerMovieKkphim(); err != nil {
-		utils.ResponseError(ctx, err)
-	}
-
-	utils.ResponseSatus(ctx, http.StatusOK)
-}
-
 func (uh *UserHandler) CrawlerAllKkphim(ctx *gin.Context) {
 	if err := uh.service.CrawlerAllKKphim(); err != nil {
 		utils.ResponseError(ctx, err)
@@ -50,17 +34,11 @@ func (uh *UserHandler) CrawlerAllKkphim(ctx *gin.Context) {
 
 	utils.ResponseSatus(ctx, http.StatusOK)
 }
+
 //NGUONC
-func (uh *UserHandler) CrawlerTvNguonC(ctx *gin.Context) {
+func (uh *UserHandler) CrawlerAllNguonC(ctx *gin.Context) {
 
-	go uh.service.CrawlerTvNguonC()
-	
-	utils.ResponseSatus(ctx, http.StatusOK)
-}
-
-func (uh *UserHandler) CrawlerMovieNguonC(ctx *gin.Context) {
-
-	go uh.service.CrawlerMovieNguonC()
+	go uh.service.CrawlerAllNguonC()
 	
 	utils.ResponseSatus(ctx, http.StatusOK)
 }
