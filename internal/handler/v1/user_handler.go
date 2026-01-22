@@ -4,20 +4,14 @@ import (
 	"net/http"
 
 	v1service "vidbox-api/internal/service/v1"
-
-	"github.com/google/uuid"
-
 	"vidbox-api/internal/utils"
-
 	"github.com/gin-gonic/gin"
 )
 
 type UserHandler struct {
 	service v1service.UserService
 }
-type GetUserByUUIDParam struct{
-	Uuid uuid.UUID `uri:"uuid" binding:"uuid"`
-}
+
 func NewUserHandler(service v1service.UserService) *UserHandler {
 	return &UserHandler{
 		service: service,
@@ -30,7 +24,6 @@ func (uh *UserHandler) Crawler(ctx *gin.Context) {
 	}
 
 	utils.ResponseSatus(ctx, http.StatusOK)
-
 }
 
 //KKPHIM
@@ -59,8 +52,15 @@ func (uh *UserHandler) CrawlerAllKkphim(ctx *gin.Context) {
 }
 //NGUONC
 func (uh *UserHandler) CrawlerTvNguonC(ctx *gin.Context) {
-	
+
 	go uh.service.CrawlerTvNguonC()
+	
+	utils.ResponseSatus(ctx, http.StatusOK)
+}
+
+func (uh *UserHandler) CrawlerMovieNguonC(ctx *gin.Context) {
+
+	go uh.service.CrawlerMovieNguonC()
 	
 	utils.ResponseSatus(ctx, http.StatusOK)
 }
