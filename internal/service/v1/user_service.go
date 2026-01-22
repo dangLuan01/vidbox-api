@@ -335,6 +335,30 @@ func (us *userService) SearchMovie(name string, year int) int {
 	return 0
 }
 
+func (us *userService) SearchMovieNguonC(name string) int {
+	resp, err := http.Get(fmt.Sprintf("https://api.themoviedb.org/3/search/movie?api_key=ef311eb0b9b07b9c73e9fb0a732cc150&query=%s&include_adult=false&language=en-US&page=1", name))
+	if err != nil {
+		log.Printf("⛔ SEARCH Movie ERR:%s\n", err)
+		return 0
+	}
+	defer resp.Body.Close()
+
+	var raw ResponseTmdb
+	if err := json.NewDecoder(resp.Body).Decode((&raw)); err != nil {
+		
+		log.Printf("⛔ DECODE TV ERR:%s\n", err)
+		log.Printf("⛔ Name Search ERR:%s\n", name)
+		log.Printf("⛔ BODY ERR:%s\n", resp.Body)
+		return 0
+	}
+
+	if len(raw.Results) > 0 {
+		return raw.Results[0].Id	
+	}
+	log.Printf("⛔ Name Search Not Found:%s\n", name)
+	return 0
+}
+
 func (us *userService) CrawlerTvNguonC() error {
 	for i := 1; i <= 13106; i++ {
 		log.Printf("CRAWLER PAGE:%d", i)
@@ -365,6 +389,49 @@ func (us *userService) CrawlerTvNguonC() error {
 					TMDBID: strconv.Itoa(tmdbId),
 					Slug: item.Slug,
 				})
+				time.Sleep(500 * time.Millisecond)
+			}
+		}
+		
+		if err := us.repo.StoreCrawlerNguonC(results); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (us *userService) CrawlerMovieNguonC() error {
+	for i := 1; i <= 1818; i++ {
+		log.Printf("CRAWLER PAGE:%d", i)
+		resp, err := http.Get(fmt.Sprintf("https://phim.nguonc.com/api/films/danh-sach/phim-le?page=%d", i))
+		if err != nil {
+			log.Printf("CRAWLER ERR PAGE:%d\n", i)
+		}
+		defer resp.Body.Close()
+
+		var raw ResponseNguonC
+		if err := json.NewDecoder(resp.Body).Decode((&raw)); err != nil {
+			log.Printf("DECODE ERR PAGE:%d\n", i)
+		}
+
+		var results []v1dto.MediaCrawlerNguonC
+
+		for _, item := range raw.Items {
+			// if us.repo.FindSlugExistKKphim(item.Slug) {
+			// 	log.Printf("🎯 SLUG EXTING:%s\n", item.Slug)
+			// 	continue
+			// }
+			tmdbId := us.SearchMovieNguonC(utils.RegexOriginalName(item.OriginName))
+			if tmdbId != 0 {
+				//log.Printf("🎉 FOUND NEW SLUG:%s - %d\n", item.Slug, tmdbId)
+				results = append(results, v1dto.MediaCrawlerNguonC{
+					Type: "movie",
+					Season: nil,
+					TMDBID: strconv.Itoa(tmdbId),
+					Slug: item.Slug,
+				})
+
 				time.Sleep(500 * time.Millisecond)
 			}
 		}
