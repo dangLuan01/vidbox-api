@@ -34,7 +34,6 @@ func (ur *UserRoutes) Register(r *gin.RouterGroup) {
 		//kkphim
 		users.GET("/kkphim/all", ur.handler.CrawlerAllKkphim)
 		//nguonc
-		users.GET("/nguonc/tv", ur.handler.CrawlerTvNguonC)
-		users.GET("/nguonc/movie", ur.handler.CrawlerMovieNguonC)
+		users.GET("/nguonc/all", ur.handler.CrawlerAllNguonC)		
 	}
 }
