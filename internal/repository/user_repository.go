@@ -101,6 +101,26 @@ func (ur *SqlUserRepository) FindSlugExistKKphim(slug string) bool{
 	return false
 }
 
+func (ur *SqlUserRepository) FindSlugExistNguonC(slug string) bool{
+
+	var slugNguonCphim string
+
+	ds := ur.db.From(goqu.T("provider_nguoncs")).Where(
+		goqu.C("nguonc_slug").Eq(slug),
+	)
+
+	found, err := ds.ScanVal(&slugNguonCphim)
+	if found {
+		return true
+	}
+
+	if err != nil {
+		return true
+	}
+
+	return false
+}
+
 func (ur *SqlUserRepository) StoreCrawlerKKphim(media []v1dto.MediaCrawlerKKphim) error {
 
 	if len(media) > 0 {

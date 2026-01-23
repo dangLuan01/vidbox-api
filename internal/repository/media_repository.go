@@ -23,6 +23,7 @@ func (mr *SqlMediaRepository) FindByTMDBID(params v1dto.MediaInput) (v1dto.Media
 	ds := mr.db.From(goqu.T("medias")).Select(
 		goqu.C("ophim_slug"),
 		goqu.C("kkphim_slug"),
+		goqu.C("nguonc_slug"),
 	)
 
 	if params.MediaType == "tv" {

@@ -8,6 +8,7 @@ type UserRepository interface {
 	StoreCrawler(media []v1dto.MediaCrawler) error
 	FindSlugExist(slug string) bool
 	FindSlugExistKKphim(slug string) bool
+	FindSlugExistNguonC(slug string) bool
 	StoreCrawlerKKphim(media []v1dto.MediaCrawlerKKphim) error
 	StoreCrawlerNguonC(media []v1dto.MediaCrawlerNguonC) error
 	FindMediaByTmdb(tmdbId string, season *int, mediaType string) bool
