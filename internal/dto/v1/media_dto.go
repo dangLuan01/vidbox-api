@@ -9,6 +9,7 @@ type MediaInput struct {
 type MediaOutput struct {
 	OPhimSlug 	*string	`db:"ophim_slug" json:"ophim_slug"`
 	KKPhimSlug 	*string	`db:"kkphim_slug" json:"kkphim_slug"`
+	NguonCSlug 	*string	`db:"nguonc_slug" json:"nguonc_slug"`
 }
 
 type MediaCrawler struct {

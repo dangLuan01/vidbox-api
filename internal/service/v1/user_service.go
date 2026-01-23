@@ -276,9 +276,9 @@ func (us *userService) SearchMovieNguonC(name string) int {
 }
 
 func (us *userService) CrawlerAllNguonC() error {
-	for i := 1; i <= 656; i++ {
+	for i := 1; i <= 3; i++ {
 		log.Printf("CRAWLER PAGE:%d", i)
-		resp, err := http.Get(fmt.Sprintf("https://phim.nguonc.com/api/films/danh-sach/hoat-hinh?page=%d", i))
+		resp, err := http.Get(fmt.Sprintf("https://phim.nguonc.com/api/films/phim-moi-cap-nhat?page=%d", i))
 		if err != nil {
 			log.Printf("CRAWLER ERR PAGE:%d\n", i)
 		}
@@ -294,10 +294,10 @@ func (us *userService) CrawlerAllNguonC() error {
 
 		for _, item := range raw.Items {
 
-			// if us.repo.FindSlugExistKKphim(item.Slug) {
-			// 	log.Printf("🎯 SLUG EXTING:%s\n", item.Slug)
-			// 	continue
-			// }
+			if us.repo.FindSlugExistNguonC(item.Slug) {
+				log.Printf("🎯 SLUG EXTING:%s\n", item.Slug)
+				continue
+			}
 
 			if item.CurrentEpisode == "FULL" {
 				tmdbId := us.SearchMovieNguonC(utils.RegexOriginalName(item.OriginName))
