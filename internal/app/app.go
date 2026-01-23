@@ -35,7 +35,7 @@ func NewApplication(cfg *config.Config) (*Application, error) {
 	}
 	
 	r := gin.Default()
-	
+
 	if err := db.InitDB(); err != nil {
 		log.Fatalf("⛔ Unable to connect to sql")
 		return nil, err
@@ -72,6 +72,7 @@ func getModuleRoutes(modules []Module) []routes.Route {
 
 	return routeList
 }
+
 func LoadEnv()  {
 	err := godotenv.Load("../../.env")
 	if err != nil {
