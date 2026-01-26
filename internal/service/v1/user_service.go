@@ -276,7 +276,7 @@ func (us *userService) SearchMovieNguonC(name string) int {
 }
 
 func (us *userService) CrawlerAllNguonC() error {
-	for i := 1; i <= 3; i++ {
+	for i := 1; i <= 5; i++ {
 		log.Printf("CRAWLER PAGE:%d", i)
 		resp, err := http.Get(fmt.Sprintf("https://phim.nguonc.com/api/films/phim-moi-cap-nhat?page=%d", i))
 		if err != nil {
